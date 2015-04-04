@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150403234317) do
+ActiveRecord::Schema.define(version: 20150404194634) do
 
   create_table "cities", force: :cascade do |t|
     t.string   "name"
@@ -67,12 +67,12 @@ ActiveRecord::Schema.define(version: 20150403234317) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
+    t.string   "email",                  default: "",    null: false
+    t.string   "encrypted_password",     default: "",    null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,  null: false
+    t.integer  "sign_in_count",          default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
@@ -87,8 +87,8 @@ ActiveRecord::Schema.define(version: 20150403234317) do
     t.string   "race"
     t.integer  "city_id"
     t.integer  "state_id"
-    t.boolean  "is_admin"
     t.string   "age"
+    t.boolean  "is_admin",               default: false
   end
 
   add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
