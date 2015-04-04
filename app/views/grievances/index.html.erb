@@ -67,7 +67,7 @@
   <tbody>
     <% @grievances.each do |grievance| %>
       <tr data-show-path="<%= grievance_path(grievance) %>">
-        <td><%= grievance.id %> <%= grievance.visible && grievance.revision.blank? ? "" : "<span class='label label-danger' data-toggle='tooltip' data-placement='left' title='Waiting for approval'>*</span>".html_safe %></td>
+        <td><%= grievance.id %> <%= grievance.visible? ? "" : "<span class='label label-warning' data-toggle='tooltip' data-placement='left' title='Created, waiting for approval'>*</span>".html_safe %> <%= grievance.revision.blank? ? "" : "<span class='label label-danger' data-toggle='tooltip' data-placement='left' title='Changed, waiting for approval'>*</span>".html_safe %></td>
         <td><%= grievance.date_incident %></td>
         <td><%= "#{grievance.state.try(:name)} - #{grievance.city.try(:name)}" %></td>
         <td><%= "#{grievance.cop.try(:badge_number)} - #{grievance.cop.try(:name)}" %></td>

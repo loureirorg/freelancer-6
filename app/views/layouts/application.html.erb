@@ -31,7 +31,7 @@
           <% if user_signed_in? %>
             <p class="navbar-text">Hi, <%= current_user.name.presence || current_user.email %>!</p>
             <li class="divider"></li>
-            <li <%= action_name == "my_grievances" ? 'class="active"'.html_safe : "" %>><a href="<%= my_grievances_path %>">My Grievances <span class="badge"><%= Grievance.where(user: current_user).count %></span></a></li>
+            <li <%= action_name == "my_grievances" ? 'class="active"'.html_safe : "" %>><a href="<%= my_grievances_path %>">My Grievances <span class="badge"><%= Grievance.where(user: current_user).where.not(is_revision: true).count %></span></a></li>
             <% if current_user.is_admin %>
               <%
                 new_grievances_count = Grievance.where(is_new: true).count
