@@ -13,7 +13,7 @@ class GrievancesController < ApplicationController
 
   def my_grievances
     @title = "My Grievances"
-    @grievances = current_user.grievances.order(date_incident: :desc).paginate(:page => params[:page], :per_page => 20)
+    @grievances = current_user.grievances.where.not(is_revision: true).order(date_incident: :desc).paginate(:page => params[:page], :per_page => 20)
     render :index
   end
 
