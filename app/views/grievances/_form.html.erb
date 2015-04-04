@@ -1,0 +1,141 @@
+<% 
+  # novo? descobrimos cidade e estado
+  if @grievance.id.nil?
+    location = GeoIP.new('db/GeoLiteCity.dat').city(request.remote_ip)
+    if location.try(:country_code2) == "US"
+      @grievance.state_name = location.region_name
+      @grievance.city_name = location.city_name
+    else
+      @grievance.state_name = "CA"
+      @grievance.city_name = "San Francisco"
+    end
+  end
+%>
+
+<%= simple_form_for @grievance do |f| %>
+  <%= f.error_notification %>
+
+  <div class="row">
+    <div class="col-md-2">
+      <%= f.input :id, label: "Code #", readonly: true %>
+    </div>
+    <div class="col-md-2">
+      <%= f.input :state_name, collection: CS.states(:us).map { |k,v| ["#{k} - #{v}", k] }, prompt: "-- Select a State", label: "State" %>
+    </div>
+    <div class="col-md-2">
+      <%= f.input :city_name, collection: CS.cities(@grievance.state_name, :us), prompt: @grievance.state_name.blank? ? "-- Select a State First --" : "-- Select a City --", label: "City" %>
+    </div>
+    <div class="col-md-2">
+      <%= f.input :date_incident, as: :string, input_html: { class: "date", placeholder: "mm/dd/yyyy", value: @grievance.date_incident.strftime("%m/%d/%Y") }, label: "Incident Date" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.input :cop_id, label: "Cop (name / badge number)", input_html: { data: { name: @grievance.cop.try(:name) || "", badge: @grievance.cop.try(:badge_number) || "" } } %>
+      <input type="hidden" name="grievance[cop_name]" value="">
+      <input type="hidden" name="grievance[cop_badge]" value="">
+      <input type="hidden" name="grievance[cop_race]" value="">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <%= f.input :title, label: "Incident Title (be succinct - try to use about 3 words)" %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <%= f.input :description, label: "Incident Description", input_html: {rows: 7} %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <%= f.input :connected_grievances_ids, label: "Connected Grievances", input_html: { data: { info: @grievance.connected_grievances.map { |g| { id: g.id, title: g.title } }.to_json } } %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-2">
+      <%= f.input :publish_user_race %>
+    </div>
+    <div class="col-md-2">
+      <%= f.input :publish_user_age %>
+    </div>
+  </div>
+
+  <br>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+            grievances_path, :class => 'btn btn-default' %>
+  <%= f.button :submit, class: 'btn btn-primary' %>
+<% end %>
+
+<a data-target="#new-cop" data-toggle="modal" class="hide" id="btn-new-cop"></a>
+
+<div id="new-cop" class="modal fade" tabindex="-1" data-width="100">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="<%= create_cop_path %>" id="form-cop">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <h4 class="modal-title">New Cop</h4>
+      </div>
+
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4 element-group">
+            <label class="control-label" for="cop_name">
+              <span class="title">Name</span>
+            </label>
+            <p>
+              <input class="form-control" type="text" id="cop-name" name="cop[name]">
+            </p>
+            <p>
+              <span class="help-block"></span>
+            </p>
+          </div>
+          <!--/col-md-4-->
+
+          <div class="col-md-4 element-group">
+            <label class="control-label" for="cop_badge">
+              <span class="title">Badge Number</span>
+            </label>
+            <p>
+              <input class="form-control" type="text" id="cop-badge" name="cop[badge]">
+            </p>
+            <p>
+              <span class="help-block"></span>
+            </p>
+          </div>
+          <!--/col-md-4-->
+
+          <div class="col-md-4 element-group">
+            <label class="control-label" for="cop_race">
+              <span class="title">Cop Ethnicy</span>
+            </label>
+            <p>
+              <select class="form-control" type="text" id="cop-race" name="cop[race]">
+                <option value="Asian">Asian</option>
+                <option value="Black">Black</option>
+                <option value="Latino">Latino</option>
+                <option value="White">White</option>
+                <option value="">I don't know</option>
+              </select>
+            </p>
+            <p>
+              <span class="help-block"></span>
+            </p>
+          </div>
+          <!--/col-md-4-->
+        </div>
+        <!--/row-->
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" id="btn-cancel-cop" class="btn btn-default">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="btn-save-cop">Create Cop</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

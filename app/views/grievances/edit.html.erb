@@ -1,0 +1,9 @@
+<div class="alert alert-dismissible alert-info" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  Your changes will be visible after approval.
+</div>
+
+<div class="page-header">
+  <h1>Edit Grievance #<%= @original.present? ? @original.id : @grievance.id %></h1>
+</div>
+<%= render :partial => 'form' %>

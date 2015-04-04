@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>Cop Yelp</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body data-controller="<%= controller_name %>" data-action="<%= action_name %>">
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="<%= root_path %>">Cop Yelp</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <% if user_signed_in? %>
+            <p class="navbar-text">Hi, <%= current_user.name.presence || current_user.email %>!</p>
+            <li class="divider"></li>
+            <li <%= action_name == "my_grievances" ? 'class="active"'.html_safe : "" %>><a href="<%= my_grievances_path %>">My Grievances <span class="badge"><%= Grievance.where(user: current_user).count %></span></a></li>
+            <% if current_user.is_admin %>
+              <%
+                new_grievances_count = Grievance.where(is_new: true).count
+                changed_grievances_count = Grievance.where(is_revision: false).where.not(revision: nil).count
+              %>
+              <li <%= action_name == "new_grievances" ? 'class="active"'.html_safe : "" %>><a href="<%= new_grievances_path %>">New Grievances <span class="badge <%= new_grievances_count > 0 ? "progress-bar-danger" : "" %>"><%= new_grievances_count %></span></a></li>
+              <li <%= action_name == "changed_grievances" ? 'class="active"'.html_safe : "" %>><a href="<%= changed_grievances_path %>">Changed Grievances <span class="badge <%= changed_grievances_count > 0 ? "progress-bar-danger" : "" %>"><%= changed_grievances_count %></span></a></li>
+            <% end %>
+            <li <%= "#{controller_name}/#{action_name}" == "registrations/edit" ? 'class="active"'.html_safe : "" %>><a href="<%= edit_user_registration_path %>">Edit Account</a></li>
+            <li><%= link_to("Logout", destroy_user_session_path, method: :delete) %></li>
+          <% else %>
+            <li><a href="<%= new_user_registration_path %>">Create Account</a></li>
+            <li><a href="<%= new_user_session_path %>">Login</a></li>
+          <% end %>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
+<div class="container-fluid">
+  <% flash.each do |name, msg| %>
+    <div class="alert alert-dismissible alert-<%= name == "notice" ? "success" : "danger" %>" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <%= msg %>
+    </div>
+  <% end %>
+  <div class="row">
+    <div class="col-md-12">
+      <%= yield %>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<% if @grievance.is_new %>
+<div class="alert alert-dismissible alert-warning" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  This new grievance is pending approval.
+</div>
+<% end %>
+
+<% if @grievance.revision.present? %>
+<div class="alert alert-dismissible alert-warning" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  This grievance have a pending approval revision.
+</div>
+<% end %>
+
+<div class="page-header">
+  <h1>Showing Grievance #<%= @grievance.id %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong>Incident Date:</strong></dt>
+  <dd><%= @grievance.date_incident.strftime("%m/%d/%Y") %></dd>
+  <dt><strong>City:</strong></dt>
+  <dd><%= "#{link_to @grievance.city.name, search_path(state: @grievance.state.name, city: @grievance.city.name)}, #{link_to @grievance.state.name, search_path(state: @grievance.state.name)}".html_safe %></dd>
+  <dt><strong>Cop:</strong></dt>
+  <dd><%= link_to "#{@grievance.cop.badge_number} - #{@grievance.cop.name} (#{@grievance.cop.race}), from #{@grievance.cop.city.name}, #{@grievance.cop.state.name}", search_path(cop: @grievance.cop.id) %></dd>
+  <dt><strong>Title:</strong></dt>
+  <dd><%= @grievance.title %></dd>
+  <dt><strong>Description:</strong></dt>
+  <dd><%= @grievance.description %></dd>
+  <dt><strong>User:</strong></dt>
+  <% if current_user.is_admin %>
+  <dd><%= "#{@grievance.user.name} (#{@grievance.user.email}), #{@grievance.user.age}, #{@grievance.user.race}" %></dd>
+  <% else %>
+  <dd><%= [@grievance.publish_user_age ? @grievance.user.age : "---", @grievance.publish_user_race ? @grievance.user.race : "---"].join(" / ") %></dd>
+  <% end %>
+  <dt><strong>Connected Grievances:</strong></dt>
+    <% @grievance.connected_grievances.each do |grievance| %>
+    <dd>
+      <%= link_to "##{grievance.id} - #{grievance.title} (#{grievance.city.name}, #{grievance.state.name}), on #{grievance.date_incident.strftime("%m/%d/%Y")}", grievance_path(grievance) %>
+    </dd>
+    <% end %>
+</dl>
+
+<% if @grievance.revision.present? && user_signed_in? && (current_user.is_admin || (current_user == @grievance.user)) %>
+<br>
+<dl class="dl-horizontal">
+  <h3>Pending Changes</h3>
+  <dt><strong>Incident Date:</strong></dt>
+  <dd><%= @grievance.revision.date_incident.strftime("%m/%d/%Y") %></dd>
+  <dt><strong>City:</strong></dt>
+  <dd><%= "#{link_to @grievance.revision.city.name, search_path(state: @grievance.revision.state.name, city: @grievance.revision.city.name)}, #{link_to @grievance.revision.state.name, search_path(state: @grievance.revision.state.name)}".html_safe %></dd>
+  <dt><strong>Cop:</strong></dt>
+  <dd><%= link_to "#{@grievance.revision.cop.badge_number} - #{@grievance.revision.cop.name} (#{@grievance.revision.cop.race}), from #{@grievance.revision.cop.city.name}, #{@grievance.revision.cop.state.name}", search_path(cop: @grievance.revision.cop.id) %></dd>
+  <dt><strong>Title:</strong></dt>
+  <dd><%= @grievance.revision.title %></dd>
+  <dt><strong>Description:</strong></dt>
+  <dd><%= @grievance.revision.description %></dd>
+  <dt><strong>User:</strong></dt>
+  <% if current_user.is_admin %>
+  <dd><%= "#{@grievance.revision.user.name} (#{@grievance.revision.user.email}), #{@grievance.revision.user.age}, #{@grievance.revision.user.race}" %></dd>
+  <% else %>
+  <dd><%= [@grievance.revision.publish_user_age ? @grievance.revision.user.age : "---", @grievance.revision.publish_user_race ? @grievance.revision.user.race : "---"].join(" / ") %></dd>
+  <% end %>
+  <dt><strong>Connected Grievances:</strong></dt>
+    <% @grievance.revision.connected_grievances.each do |grievance| %>
+    <dd>
+      <%= link_to "##{grievance.id} - #{grievance.title} (#{grievance.city.name}, #{grievance.state.name}), on #{grievance.date_incident.strftime("%m/%d/%Y")}", grievance_path(grievance) %>
+    </dd>
+    <% end %>
+</dl>  
+<% end %>
+
+<br>
+
+<%= link_to "Cancel", grievances_path, class: "btn btn-default" %>
+<% if user_signed_in? && (current_user.is_admin || current_user == @grievance.user) %>
+<%= link_to "Edit", edit_grievance_path(@grievance), class: "btn btn-default" %>
+<%= link_to "Delete", grievance_path(@grievance), class: "btn btn-danger", data: { confirm: "Are you sure?" } %>
+<% if current_user.is_admin && (@grievance.is_new || @grievance.revision.present?) %>
+<%= link_to "Approve", approve_grievance_path(@grievance), class: "btn btn-primary" %>
+<% if @grievance.revision.present? %>
+<%= link_to "Disapprove", disapprove_grievance_path(@grievance), class: "btn btn-default" %>
+<% end %>
+<% end %>
+<% end %>
