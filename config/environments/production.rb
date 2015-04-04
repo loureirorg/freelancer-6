@@ -76,4 +76,19 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  ActionMailer::Base.delivery_method = :smtp
+  ActionMailer::Base.perform_deliveries = true
+
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { host: 'copyelp.herokuapp.com' }
+  ActionMailer::Base.smtp_settings = {
+    address: "smtp.mandrillapp.com",
+    port: 587,
+    user_name: "loureirorg@gmail.com",
+    password: "qC2mnUEx5KBJyt7K6sDnUA",
+    authentication: :plain,
+    domain: "copyelp.com",
+    enable_starttls_auto: true
+  }
 end
