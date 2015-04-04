@@ -4,6 +4,8 @@
 $(document).on('ready page:load', function() {
 
   // specific code for this controller / action
+  alert($('body').data('controller'));
+  alert($('body').data('action'));
   var right = (($('body').data('controller') == 'grievances') && (($('body').data('action') == 'index') || ($('body').data('action') == 'search') || ($('body').data('action') == 'my_grievances') || ($('body').data('action') == 'new_grievances') || ($('body').data('action') == 'changed_grievances')));
   if (! right) return ;
 
